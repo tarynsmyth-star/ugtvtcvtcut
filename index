@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NSFW Randomizer</title>
+  <style>
+    :root { --bg: #0a0a0a; --accent: #ff2d95; }
+    body {
+      margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+      background: var(--bg); color: #eee; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    header { text-align: center; padding: 2rem 1rem; }
+    h1 {
+      font-size: 3rem; margin: 0;
+      background: linear-gradient(90deg, #ff2d95, #9b4dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .container { max-width: 1000px; width: 100%; padding: 1rem; }
+    #image-container {
+      width: 100%; height: 75vh; background: #1a1a1a;
+      border-radius: 20px; overflow: hidden; position: relative;
+      box-shadow: 0 15px 40px rgba(255,45,149,0.25);
+    }
+    #image {
+      width: 100%; height: 100%; object-fit: contain;
+      transition: opacity 0.4s;
+    }
+    .loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 1.4rem; color: #ff2d95; display: none;
+    }
+    button {
+      background: var(--accent); color: white; border: none;
+      padding: 18px 50px; font-size: 1.4rem; font-weight: bold;
+      border-radius: 50px; cursor: pointer; margin-top: 2rem;
+      box-shadow: 0 10px 25px rgba(255,45,149,0.4);
+      transition: all 0.3s;
+    }
+    button:hover { transform: scale(1.08); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NSFW Randomizer</h1>
+    <p>Random 18+ Images</p>
+  </header>
+
+  <div class="container">
+    <div id="image-container">
+      <img id="image" src="" alt="Random NSFW Image">
+      <div id="loading" class="loading">Loading spicy image...</div>
+    </div>
+
+    <div style="text-align:center">
+      <button onclick="generateImage()">New Random Image</button>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem; opacity:0.7; font-size:0.95rem;">
+      18+ Only • Explicit Content
+    </div>
+  </div>
+
+  <script>
+    // Large list of direct NSFW image links (you can add more)
+    const imageSources = [
+      "https://i.imgur.com/3v4t6X1.jpg",
+      "https://i.imgur.com/8z3kL9P.jpg",
+      "https://i.imgur.com/5fG7h2m.jpg",
+      "https://i.imgur.com/Jz9kPqR.jpg",
+      "https://i.imgur.com/XpL2mNq.jpg",
+      "https://picsum.photos/id/1015/1200/800", // fallback
+      "https://picsum.photos/id/133/1200/800",
+      // Add more direct links here (imgur, catbox, etc.)
+    ];
+
+    async function generateImage() {
+      const img = document.getElementById('image');
+      const loading = document.getElementById('loading');
+
+      loading.style.display = 'block';
+      img.style.opacity = '0.3';
+
+      // Pick random image
+      const randomIndex = Math.floor(Math.random() * imageSources.length);
+      const url = imageSources[randomIndex];
+
+      img.src = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+      img.onload = () => {
+        loading.style.display = 'none';
+        img.style.opacity = '1';
+      };
+
+      img.onerror = () => {
+        loading.style.display = 'none';
+        img.src = "https://picsum.photos/id/1015/1200/800";
+      };
+    }
+
+    // Load first image
+    window.onload = generateImage;
+  </script>
+</body>
+</html>
