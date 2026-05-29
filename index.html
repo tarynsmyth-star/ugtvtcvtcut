@@ -39,79 +39,63 @@
       transition: all 0.3s;
     }
     button:hover { transform: scale(1.08); }
-    .controls { text-align: center; margin: 1.5rem 0; }
-    select, input { padding: 10px; margin: 0 8px; border-radius: 8px; background: #222; color: white; border: 1px solid #444; }
   </style>
 </head>
 <body>
   <header>
     <h1>NSFW Randomizer</h1>
-    <p>Random 18+ images from Reddit</p>
+    <p>Random 18+ Images</p>
   </header>
 
   <div class="container">
     <div id="image-container">
-      <img id="image" src="" alt="Random NSFW">
-      <div id="loading" class="loading">Loading hot image...</div>
+      <img id="image" src="" alt="Random NSFW Image">
+      <div id="loading" class="loading">Loading spicy image...</div>
     </div>
 
-    <div class="controls">
-      <select id="subreddit">
-        <option value="nsfw">r/NSFW</option>
-        <option value="gonewild">r/GoneWild</option>
-        <option value="realgirls">r/RealGirls</option>
-        <option value="collegesluts">r/CollegeSluts</option>
-        <option value="pawg">r/PAWG</option>
-        <option value="hentai">r/Hentai</option>
-        <option value="rule34">r/rule34</option>
-        <option value="ass">r/ass</option>
-        <option value="boobs">r/Boobs</option>
-      </select>
-      <button onclick="generateImage()">New Image</button>
+    <div style="text-align:center">
+      <button onclick="generateImage()">New Random Image</button>
     </div>
 
-    <div style="text-align:center; margin-top:1rem; opacity:0.7; font-size:0.95rem;">
-      18+ Only • Explicit Content • Use at your own risk
+    <div style="text-align:center; margin-top:1.5rem; opacity:0.7; font-size:0.95rem;">
+      18+ Only • Explicit Content
     </div>
   </div>
 
   <script>
-    const img = document.getElementById('image');
-    const loading = document.getElementById('loading');
+    // Large list of direct NSFW image links (you can add more)
+    const imageSources = [
+      "https://i.imgur.com/3v4t6X1.jpg",
+      "https://i.imgur.com/8z3kL9P.jpg",
+      "https://i.imgur.com/5fG7h2m.jpg",
+      "https://i.imgur.com/Jz9kPqR.jpg",
+      "https://i.imgur.com/XpL2mNq.jpg",
+      "https://picsum.photos/id/1015/1200/800", // fallback
+      "https://picsum.photos/id/133/1200/800",
+      // Add more direct links here (imgur, catbox, etc.)
+    ];
 
     async function generateImage() {
-      const subreddit = document.getElementById('subreddit').value;
+      const img = document.getElementById('image');
+      const loading = document.getElementById('loading');
+
       loading.style.display = 'block';
       img.style.opacity = '0.3';
 
-      try {
-        // Fetch random post from chosen subreddit
-        const res = await fetch(`https://www.reddit.com/r/${subreddit}/random.json`);
-        const data = await res.json();
-        
-        const post = data[0].data.children[0].data;
-        
-        let imageUrl = '';
+      // Pick random image
+      const randomIndex = Math.floor(Math.random() * imageSources.length);
+      const url = imageSources[randomIndex];
 
-        if (post.url.endsWith('.jpg') || post.url.endsWith('.png') || post.url.endsWith('.gif')) {
-          imageUrl = post.url;
-        } else if (post.preview && post.preview.images) {
-          imageUrl = post.preview.images[0].source.url.replace('amp;', '');
-        } else {
-          // Fallback
-          imageUrl = 'https://picsum.photos/id/1015/800/1200';
-        }
-
-        img.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-
-      } catch (e) {
-        console.error(e);
-        img.src = 'https://picsum.photos/id/1015/800/1200';
-      }
+      img.src = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
 
       img.onload = () => {
         loading.style.display = 'none';
         img.style.opacity = '1';
+      };
+
+      img.onerror = () => {
+        loading.style.display = 'none';
+        img.src = "https://picsum.photos/id/1015/1200/800";
       };
     }
 
@@ -119,4 +103,4 @@
     window.onload = generateImage;
   </script>
 </body>
-</html> 
+</html>
