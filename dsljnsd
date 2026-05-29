@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NSFW Randomizer</title>
+  <style>
+    :root { --bg: #0a0a0a; --accent: #ff2d95; }
+    body {
+      margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+      background: var(--bg); color: #eee; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    header { text-align: center; padding: 2rem 1rem; }
+    h1 {
+      font-size: 3rem; margin: 0;
+      background: linear-gradient(90deg, #ff2d95, #9b4dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .container { max-width: 1000px; width: 100%; padding: 1rem; }
+    #image-container {
+      width: 100%; height: 75vh; background: #1a1a1a;
+      border-radius: 20px; overflow: hidden; position: relative;
+      box-shadow: 0 15px 40px rgba(255,45,149,0.25);
+    }
+    #image {
+      width: 100%; height: 100%; object-fit: contain;
+      transition: opacity 0.4s;
+    }
+    .loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 1.4rem; color: #ff2d95; display: none;
+    }
+    button {
+      background: var(--accent); color: white; border: none;
+      padding: 18px 50px; font-size: 1.4rem; font-weight: bold;
+      border-radius: 50px; cursor: pointer; margin-top: 2rem;
+      box-shadow: 0 10px 25px rgba(255,45,149,0.4);
+      transition: all 0.3s;
+    }
+    button:hover { transform: scale(1.08); }
+    .controls { text-align: center; margin: 1.5rem 0; }
+    select, input { padding: 10px; margin: 0 8px; border-radius: 8px; background: #222; color: white; border: 1px solid #444; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NSFW Randomizer</h1>
+    <p>Random 18+ images from Reddit</p>
+  </header>
+
+  <div class="container">
+    <div id="image-container">
+      <img id="image" src="" alt="Random NSFW">
+      <div id="loading" class="loading">Loading hot image...</div>
+    </div>
+
+    <div class="controls">
+      <select id="subreddit">
+        <option value="nsfw">r/NSFW</option>
+        <option value="gonewild">r/GoneWild</option>
+        <option value="realgirls">r/RealGirls</option>
+        <option value="collegesluts">r/CollegeSluts</option>
+        <option value="pawg">r/PAWG</option>
+        <option value="hentai">r/Hentai</option>
+        <option value="rule34">r/rule34</option>
+        <option value="ass">r/ass</option>
+        <option value="boobs">r/Boobs</option>
+      </select>
+      <button onclick="generateImage()">New Image</button>
+    </div>
+
+    <div style="text-align:center; margin-top:1rem; opacity:0.7; font-size:0.95rem;">
+      18+ Only • Explicit Content • Use at your own risk
+    </div>
+  </div>
+
+  <script>
+    const img = document.getElementById('image');
+    const loading = document.getElementById('loading');
+
+    async function generateImage() {
+      const subreddit = document.getElementById('subreddit').value;
+      loading.style.display = 'block';
+      img.style.opacity = '0.3';
+
+      try {
+        // Fetch random post from chosen subreddit
+        const res = await fetch(`https://www.reddit.com/r/${subreddit}/random.json`);
+        const data = await res.json();
+        
+        const post = data[0].data.children[0].data;
+        
+        let imageUrl = '';
+
+        if (post.url.endsWith('.jpg') || post.url.endsWith('.png') || post.url.endsWith('.gif')) {
+          imageUrl = post.url;
+        } else if (post.preview && post.preview.images) {
+          imageUrl = post.preview.images[0].source.url.replace('amp;', '');
+        } else {
+          // Fallback
+          imageUrl = 'https://picsum.photos/id/1015/800/1200';
+        }
+
+        img.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+      } catch (e) {
+        console.error(e);
+        img.src = 'https://picsum.photos/id/1015/800/1200';
+      }
+
+      img.onload = () => {
+        loading.style.display = 'none';
+        img.style.opacity = '1';
+      };
+    }
+
+    // Load first image
+    window.onload = generateImage;
+  </script>
+</body>
+</html> 
